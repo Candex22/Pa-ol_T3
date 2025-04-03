@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-04-2025 a las 17:13:34
+-- Tiempo de generación: 03-04-2025 a las 02:27:58
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -39,7 +39,8 @@ CREATE TABLE `pedidos` (
   `herramienta` int(11) NOT NULL,
   `curso` enum('primero','segundo','tercero','cuarto') NOT NULL,
   `retirante` varchar(30) NOT NULL,
-  `encargado` int(11) NOT NULL
+  `encargado` int(11) NOT NULL,
+  `fecha_pedido` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -69,8 +70,14 @@ ALTER TABLE `herramientas`
 --
 ALTER TABLE `pedidos`
   ADD PRIMARY KEY (`id_pedido`),
-  ADD UNIQUE KEY `encargado` (`encargado`),
-  ADD KEY `herramienta` (`herramienta`);
+  ADD KEY `herramienta` (`herramienta`),
+  ADD KEY `encargado` (`encargado`);
+
+--
+-- Indices de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  ADD PRIMARY KEY (`id_user`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -80,11 +87,22 @@ ALTER TABLE `pedidos`
 -- AUTO_INCREMENT de la tabla `herramientas`
 --
 ALTER TABLE `herramientas`
-  MODIFY `codigo` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
   MODIFY `id_pedido` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `pedidos`
+--
+ALTER TABLE `pedidos`
+  ADD CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`herramienta`) REFERENCES `herramientas` (`codigo`),
+  ADD CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`encargado`) REFERENCES `usuario` (`id_user`);
 COMMIT;
