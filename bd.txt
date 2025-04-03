@@ -3,13 +3,19 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-04-2025 a las 02:27:58
+-- Tiempo de generación: 03-04-2025 a las 18:19:15
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Base de datos: `panol`
@@ -27,6 +33,13 @@ CREATE TABLE `herramientas` (
   `imagen` varchar(200) DEFAULT NULL,
   `cantidad` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `herramientas`
+--
+
+INSERT INTO `herramientas` (`codigo`, `nombre`, `imagen`, `cantidad`) VALUES
+(5, 'destornillador', 'uploads/tools/67ede5491f389.jpg', 15);
 
 -- --------------------------------------------------------
 
@@ -52,8 +65,18 @@ CREATE TABLE `pedidos` (
 CREATE TABLE `usuario` (
   `id_user` int(11) NOT NULL,
   `name_user` varchar(30) NOT NULL,
-  `contraseña` varchar(20) NOT NULL
+  `nombre` varchar(50) NOT NULL,
+  `apellido` varchar(50) NOT NULL,
+  `correo_electronico` varchar(100) NOT NULL,
+  `contrasena` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuario`
+--
+
+INSERT INTO `usuario` (`id_user`, `name_user`, `nombre`, `apellido`, `correo_electronico`, `contrasena`) VALUES
+(4, 'josefina532124', 'Ibarra', 'Guillermo', 'josefina42@gmail.com', 'pepe123');
 
 --
 -- Índices para tablas volcadas
@@ -87,13 +110,19 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `herramientas`
 --
 ALTER TABLE `herramientas`
-  MODIFY `codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
   MODIFY `id_pedido` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Restricciones para tablas volcadas
@@ -106,3 +135,7 @@ ALTER TABLE `pedidos`
   ADD CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`herramienta`) REFERENCES `herramientas` (`codigo`),
   ADD CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`encargado`) REFERENCES `usuario` (`id_user`);
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
