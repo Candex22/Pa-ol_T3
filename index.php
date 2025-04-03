@@ -67,19 +67,19 @@ $logged_in = true; // Replace with actual authentication check
                         <a class="nav-link" href="components/herramientas_lista.php">Herramientas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="pedidos_lista.php">Pedidos</a>
+                        <a class="nav-link" href="components/pedidos_lista.php">Pedidos</a>
                     </li>
                 </ul>
                 <div class="navbar-nav">
                     <?php if ($logged_in): ?>
-                        <a class="nav-link" href="perfil.php">
+                        <a class="nav-link" href="components/perfil.php">
                             <i class="fas fa-user me-1"></i> Mi Perfil
                         </a>
-                        <a class="nav-link" href="logout.php">
+                        <a class="nav-link" href="components/logout.php">
                             <i class="fas fa-sign-out-alt me-1"></i> Cerrar Sesión
                         </a>
                     <?php else: ?>
-                        <a class="nav-link" href="login.php">
+                        <a class="nav-link" href="components/login.php">
                             <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión
                         </a>
                     <?php endif; ?>
@@ -148,7 +148,7 @@ $logged_in = true; // Replace with actual authentication check
                         <i class="fas fa-tools menu-icon text-primary"></i>
                         <h3>Gestión de Herramientas</h3>
                         <p>Administra el inventario de herramientas, agrega nuevas o actualiza las existentes.</p>
-                        <a href="herramientas_lista.php" class="btn btn-primary">Acceder</a>
+                        <a href="components/herramientas_lista.php" class="btn btn-primary">Acceder</a>
                     </div>
                 </div>
             </div>
@@ -158,7 +158,7 @@ $logged_in = true; // Replace with actual authentication check
                         <i class="fas fa-clipboard-list menu-icon text-success"></i>
                         <h3>Gestión de Pedidos</h3>
                         <p>Registra nuevos pedidos y gestiona el estado de las herramientas prestadas.</p>
-                        <a href="pedidos_lista.php" class="btn btn-success">Acceder</a>
+                        <a href="components/pedidos_lista.php" class="btn btn-success">Acceder</a>
                     </div>
                 </div>
             </div>
@@ -168,7 +168,7 @@ $logged_in = true; // Replace with actual authentication check
                         <i class="fas fa-chart-bar menu-icon text-info"></i>
                         <h3>Reportes y Estadísticas</h3>
                         <p>Visualiza informes detallados sobre el uso de herramientas y pedidos.</p>
-                        <a href="reportes.php" class="btn btn-info">Acceder</a>
+                        <a href="components/reportes.php" class="btn btn-info">Acceder</a>
                     </div>
                 </div>
             </div>
@@ -216,7 +216,7 @@ $logged_in = true; // Replace with actual authentication check
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <a href="herramienta_form.php?codigo=<?php echo $tool['codigo']; ?>" class="btn btn-sm btn-primary">
+                                            <a href="components/herramienta_form.php?codigo=<?php echo $tool['codigo']; ?>" class="btn btn-sm btn-primary">
                                                 <i class="fas fa-edit"></i> Editar
                                             </a>
                                         </td>
@@ -226,7 +226,7 @@ $logged_in = true; // Replace with actual authentication check
                         </table>
                     </div>
                     <div class="text-end mt-3">
-                        <a href="herramientas_lista.php" class="btn btn-outline-primary">Ver todas las herramientas</a>
+                        <a href="components/herramientas_lista.php" class="btn btn-outline-primary">Ver todas las herramientas</a>
                     </div>
                 <?php endif; ?>
             </div>
@@ -245,7 +245,7 @@ $logged_in = true; // Replace with actual authentication check
                     <h5>Enlaces rápidos</h5>
                     <ul class="list-unstyled">
                         <li><a href="index.php" class="text-white">Inicio</a></li>
-                        <li><a href="herramientas_lista.php" class="text-white">Herramientas</a></li>
+                        <li><a href="components/herramientas_lista.php" class="text-white">Herramientas</a></li>
                         <li><a href="pedidos_lista.php" class="text-white">Pedidos</a></li>
                     </ul>
                 </div>

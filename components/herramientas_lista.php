@@ -37,7 +37,7 @@ $tools = getAllTools();
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Gestión de Herramientas</h1>
-            <a href="herramienta_form.php" class="btn btn-success">
+            <a href="components/herramienta_form.php" class="btn btn-success">
                 <i class="fas fa-plus"></i> Agregar Herramienta
             </a>
         </div>
@@ -76,7 +76,7 @@ $tools = getAllTools();
                                 </td>
                                 <td><?php echo htmlspecialchars($tool['cantidad']); ?></td>
                                 <td>
-                                    <a href="herramienta_form.php?codigo=<?php echo $tool['codigo']; ?>" class="btn btn-sm btn-primary">
+                                    <a href="components/herramienta_form.php?codigo=<?php echo $tool['codigo']; ?>" class="btn btn-sm btn-primary">
                                         <i class="fas fa-edit"></i> Editar
                                     </a>
                                     <button class="btn btn-sm btn-danger delete-btn" data-id="<?php echo $tool['codigo']; ?>" data-name="<?php echo htmlspecialchars($tool['nombre']); ?>">
