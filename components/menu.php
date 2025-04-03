@@ -29,7 +29,7 @@
                             <i class="fas fa-sign-out-alt me-1"></i> Cerrar Sesión
                         </a>
                     <?php else: ?>
-                        <a class="nav-link" href="components/login.php">
+                        <a class="nav-link" href="login.php">
                             <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión
                         </a>
                     <?php endif; ?>

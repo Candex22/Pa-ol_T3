@@ -38,10 +38,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Iniciar sesión
             $_SESSION["id_usuario"] = $id_usuario;
             $_SESSION["correo_electronico"] = $correo;
-// Después de verificar la contraseña en login.php
-$_SESSION["id_usuario"] = $id_usuario;
-$_SESSION["name_user"] = $name_user; // Asegúrate de que $name_user contiene el nickname del usuario
-$_SESSION["correo_electronico"] = $correo;
+            // Después de verificar la contraseña en login.php
+            $_SESSION["id_usuario"] = $id_usuario;
+            $_SESSION["name_user"] = $name_user; // Asegúrate de que $name_user contiene el nickname del usuario
+            $_SESSION["correo_electronico"] = $correo;
             // Redirigir al usuario a la página principal
             header("Location: ../index.php");
             exit();
@@ -59,6 +59,7 @@ $_SESSION["correo_electronico"] = $correo;
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,6 +68,7 @@ $_SESSION["correo_electronico"] = $correo;
     <title>Sistema de Pañol - Iniciar Sesión</title>
 
 </head>
+
 <body>
     <div class="login-container">
         <h2 class="login-title">Iniciar Sesión</h2>
@@ -86,4 +88,5 @@ $_SESSION["correo_electronico"] = $correo;
         </div>
     </div>
 </body>
+
 </html>
