@@ -1,6 +1,8 @@
 <?php
 // Include the tool management module
 require_once('components/tool_management.php');
+session_start();
+$logged_in = isset($_SESSION["usuario"]); // Se considera logueado si hay una sesión activa
 
 // Get tool count
 $conn = connectDB();

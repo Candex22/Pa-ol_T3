@@ -1,3 +1,7 @@
+<?php
+$logged_in = isset($_SESSION["usuario"]); // Se considera logueado si hay una sesión activa
+?>
+
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
@@ -21,19 +25,20 @@
                     </li>
                 </ul>
                 <div class="navbar-nav">
-                    <?php if ($logged_in): ?>
-                        <a class="nav-link" href="components/perfil.php">
-                            <i class="fas fa-user me-1"></i> Mi Perfil
-                        </a>
-                        <a class="nav-link" href="components/logout.php">
-                            <i class="fas fa-sign-out-alt me-1"></i> Cerrar Sesión
-                        </a>
-                    <?php else: ?>
-                        <a class="nav-link" href="login.php">
-                            <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión
-                        </a>
-                    <?php endif; ?>
-                </div>
+    <?php if ($logged_in): ?>
+        <a class="nav-link" href="components/perfil.php">
+            <i class="fas fa-user me-1"></i> Mi Perfil
+        </a>
+        <a class="nav-link" href="logout.php">
+            <i class="fas fa-sign-out-alt me-1"></i> Cerrar Sesión
+        </a>
+    <?php else: ?>
+        <a class="nav-link" href="login.php">
+            <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión
+        </a>
+    <?php endif; ?>
+</div>
+
             </div>
         </div>
     </nav>

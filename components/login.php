@@ -64,27 +64,150 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link type="text">
-    <link rel="stylesheet" href="../styles/login.css">
-    <title>Sistema de Pañol - Iniciar Sesión</title>
+    <!--    <title>Sistema de Pañol - Iniciar Sesión</title> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
 
 </head>
+<style>
 
+body {
+    background-color: #f5f5f5;
+}
+
+
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.form-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.form-title {
+    font-size: 24px;
+    margin-bottom: 25px;
+    color: #333;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    outline: none;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.btn-warning:hover {
+    background-color: #ffca2c;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+.form-footer a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+</style>
 <body>
-    <div class="login-container">
-        <h2 class="login-title">Iniciar Sesión</h2>
-        <form action="login.php" method="POST">
-            <div class="form-group">
-                <label class="form-label" for="correo_electronico">Correo Electrónico</label>
-                <input type="email" class="form-control" id="correo_electronico" name="correo_electronico" placeholder="Ingrese su correo electrónico">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="contrasena">Contraseña</label>
-                <input type="password" class="form-control" id="contrasena" name="contrasena" placeholder="Ingrese su contraseña">
-            </div>
-            <button type="submit" class="btn">Iniciar Sesión</button>
-        </form>
-        <div class="form-footer">
-            ¿No tiene una cuenta? <a href="register.php">Regístrese aquí</a>
+<?php include('menu.php'); ?>
+
+<div class="container">
+        <div class="form-container">
+            <h2 class="form-title">Inicio de Usuario</h2>
+            
+            <form action="login.php" method="POST">
+
+                <div class="form-group">
+                    <label class="form-label">Correo electrónico</label>
+                    <input type="email" class="form-control" placeholder="Ingrese su correo electrónico" name="correo_electronico">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" placeholder="Cree una contraseña" name="contrasena">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-warning">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Iniciarse</button>
+                </div>
+                
+                <div class="form-footer">
+                    ¿No tiene una cuenta? <a href="register.php">Registrarse</a>
+                </div>
+                <?php
+                if (isset($_SESSION["registro_exitoso"]) && $_SESSION["registro_exitoso"] == true) {
+                    echo '<div class="registro-exitoso">';
+
+                    echo '</div>';
+                    unset($_SESSION["registro_exitoso"]); // Eliminar la variable para que no se muestre siempre
+                }
+    ?>
+
+            </form>
         </div>
     </div>
 </body>

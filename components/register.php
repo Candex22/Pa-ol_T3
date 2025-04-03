@@ -60,24 +60,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Pañol - Registro</title>
     <link rel="stylesheet" href="../styles/register.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <?php include('menu.php'); ?>
 
 </head>
 <body>
-    <div class="header">
-        <div class="logo">
-            <span>✕</span>
-            Sistema de Pañol
-        </div>
-        <div class="menu">
-            <a href="../index.php" class="menu-item">Inicio</a>
-            <a href="herramienta_form.php" class="menu-item">Herramientas</a>
-            <a href="#" class="menu-item">Pedidos</a>
-        </div>
-        <div class="user-menu">
-            <a href="#" class="user-menu-item">Mi Perfil</a>
-            <a href="#" class="user-menu-item">Cerrar Sesión</a>
-        </div>
-    </div>
+
 
     <div class="container">
         <div class="form-container">
@@ -118,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 
                 <div class="form-footer">
-                    ¿Ya tiene una cuenta? <a href="#">Iniciar sesión</a>
+                    ¿tiene cuenta? <a href="login.php">Iniciarse</a>
                 </div>
                 <?php
                 if (isset($_SESSION["registro_exitoso"]) && $_SESSION["registro_exitoso"] == true) {
