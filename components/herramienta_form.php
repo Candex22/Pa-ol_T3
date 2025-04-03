@@ -86,6 +86,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
+    <?php include('menu.php'); ?>
+
     <div class="container mt-5">
         <h1><?php echo $is_edit ? 'Editar' : 'Agregar'; ?> Herramienta</h1>
         
