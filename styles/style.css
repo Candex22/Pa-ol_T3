@@ -1,0 +1,41 @@
+.hero-section {
+    background-color: #f8f9fa;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+.stat-card {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+.tool-image {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+.menu-card {
+    height: 100%;
+    transition: transform 0.3s;
+}
+.menu-card:hover {
+    transform: translateY(-5px);
+}
+.menu-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
