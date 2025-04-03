@@ -19,6 +19,7 @@ $tools = getAllTools();
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,6 +34,7 @@ $tools = getAllTools();
         }
     </style>
 </head>
+
 <body>
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -41,13 +43,13 @@ $tools = getAllTools();
                 <i class="fas fa-plus"></i> Agregar Herramienta
             </a>
         </div>
-        
+
         <?php if (!empty($message)): ?>
             <div class="alert <?php echo strpos($message, 'Error') !== false ? 'alert-danger' : 'alert-success'; ?>">
                 <?php echo $message; ?>
             </div>
         <?php endif; ?>
-        
+
         <?php if (empty($tools)): ?>
             <div class="alert alert-info">No hay herramientas registradas.</div>
         <?php else: ?>
@@ -90,7 +92,7 @@ $tools = getAllTools();
             </div>
         <?php endif; ?>
     </div>
-    
+
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -109,8 +111,23 @@ $tools = getAllTools();
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="scripts/script.js"></script>
+    <script>
+        // Setup delete confirmation modal
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+
+                document.getElementById('toolName').textContent = name;
+                document.getElementById('confirmDelete').href = 'herramientas_lista.php?delete=' + id;
+
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                deleteModal.show();
+            });
+        });
+    </script>
 </body>
+
 </html>
