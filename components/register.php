@@ -103,8 +103,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-warning">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                <button type="submit" class="btn btn-primary">Registrarse</button>
+                <button type="button" class="btn btn-warning">Cancelar</button>
+                    
                 </div>
                 
                 <div class="form-footer">
