@@ -1,4 +1,11 @@
 <?php
+session_start(); // Iniciar la sesión
+
+// Verificar si el usuario está registrado
+$logged_in = isset($_SESSION['usuario_registrado']) && $_SESSION['usuario_registrado'] === true;
+
+
+
 // Include the tool management module
 require_once('tool_management.php');
 

@@ -1,4 +1,13 @@
 <?php
+
+session_start(); 
+
+
+if (!isset($_SESSION['usuario_registrado']) || $_SESSION['usuario_registrado'] !== true) {
+    
+    header("Location: components/register.php");
+    exit();
+}
 // Include the tool management module
 require_once('components/tool_management.php');
 

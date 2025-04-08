@@ -36,12 +36,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verificar la contraseña ingresada con la almacenada
         if ($contrasena === $stored_password) {
             // Iniciar sesión
+            $_SESSION["usuario_registrado"] = true; // Indicar que el usuario está autenticado
             $_SESSION["id_usuario"] = $id_usuario;
             $_SESSION["correo_electronico"] = $correo;
-            // Después de verificar la contraseña en login.php
-            $_SESSION["id_usuario"] = $id_usuario;
-            $_SESSION["name_user"] = $name_user; // Asegúrate de que $name_user contiene el nickname del usuario
-            $_SESSION["correo_electronico"] = $correo;
+
             // Redirigir al usuario a la página principal
             header("Location: ../index.php");
             exit();
@@ -84,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit" class="btn">Iniciar Sesión</button>
         </form>
         <div class="form-footer">
-            ¿No tiene una cuenta? <a href="register.php">Regístrese aquí</a>
+            ¿No tiene una cuenta? <a href="./register.php">Regístrese aquí</a>
         </div>
     </div>
 </body>

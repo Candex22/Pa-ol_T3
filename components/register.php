@@ -1,9 +1,16 @@
 <?php
-session_start(); // Mover session_start() al inicio del archivo
+session_start(); // Iniciar la sesión al comienzo del archivo
+
+// Verificar si el usuario ya está registrado
+if (isset($_SESSION['usuario_registrado']) && $_SESSION['usuario_registrado'] === true) {
+    header("Location: ../index.php"); // Redirigir al index si ya está registrado
+    exit();
+}
 
 require_once('tool_management.php');
 
 $conn = connectDB();
+
 // Verificar si el formulario fue enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre = isset($_POST["nombre"]) ? $_POST["nombre"] : "";
@@ -27,8 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Error: La contraseña debe tener más de 4 caracteres.");
     }
 
-
-
     // Prepare statement para evitar inyección SQL
     $stmt = $conn->prepare("INSERT INTO usuario (name_user, nombre, apellido, correo_electronico, contrasena) VALUES (?, ?, ?, ?, ?)");
 
@@ -41,8 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("sssss", $name_user, $nombre, $apellido, $correo, $contrasena);
 
     if ($stmt->execute()) {
-        $_SESSION["registro_exitoso"] = true; // Variable de sesión para indicar éxito
-        header("Location: register.php"); // Redirigir para evitar reenvío del formulario
+        $_SESSION["usuario_registrado"] = true; // Variable de sesión para indicar éxito
+        header("Location: ../index.php"); // Redirigir al index después del registro
         exit();
     }
 
@@ -103,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 
                 <div class="form-footer">
-                    ¿Ya tiene una cuenta? <a href="login.php">Iniciar sesión</a>
+                    ¿Ya tiene una cuenta? <a href="./login.php">Iniciar sesión</a>
                 </div>
                 <?php
                 if (isset($_SESSION["registro_exitoso"]) && $_SESSION["registro_exitoso"] == true) {
