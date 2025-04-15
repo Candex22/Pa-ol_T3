@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-04-2025 a las 18:19:15
+-- Tiempo de generación: 15-04-2025 a las 07:31:40
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -11,15 +11,22 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
 -- Base de datos: `panol`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `detalle_pedido`
+--
+
+CREATE TABLE `detalle_pedido` (
+  `id_detalle` int(11) NOT NULL,
+  `id_pedido` int(11) NOT NULL,
+  `herramienta` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -49,11 +56,13 @@ INSERT INTO `herramientas` (`codigo`, `nombre`, `imagen`, `cantidad`) VALUES
 
 CREATE TABLE `pedidos` (
   `id_pedido` int(11) NOT NULL,
-  `herramienta` int(11) NOT NULL,
   `curso` enum('primero','segundo','tercero','cuarto') NOT NULL,
   `retirante` varchar(30) NOT NULL,
   `encargado` int(11) NOT NULL,
-  `fecha_pedido` timestamp NOT NULL DEFAULT current_timestamp()
+  `fecha_pedido` timestamp NOT NULL DEFAULT current_timestamp(),
+  `estado` enum('prestado','devuelto') NOT NULL DEFAULT 'prestado',
+  `observaciones` text DEFAULT NULL,
+  `fecha_devolucion` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -83,6 +92,14 @@ INSERT INTO `usuario` (`id_user`, `name_user`, `nombre`, `apellido`, `correo_ele
 --
 
 --
+-- Indices de la tabla `detalle_pedido`
+--
+ALTER TABLE `detalle_pedido`
+  ADD PRIMARY KEY (`id_detalle`),
+  ADD KEY `id_pedido` (`id_pedido`),
+  ADD KEY `herramienta` (`herramienta`);
+
+--
 -- Indices de la tabla `herramientas`
 --
 ALTER TABLE `herramientas`
@@ -93,7 +110,6 @@ ALTER TABLE `herramientas`
 --
 ALTER TABLE `pedidos`
   ADD PRIMARY KEY (`id_pedido`),
-  ADD KEY `herramienta` (`herramienta`),
   ADD KEY `encargado` (`encargado`);
 
 --
@@ -105,6 +121,12 @@ ALTER TABLE `usuario`
 --
 -- AUTO_INCREMENT de las tablas volcadas
 --
+
+--
+-- AUTO_INCREMENT de la tabla `detalle_pedido`
+--
+ALTER TABLE `detalle_pedido`
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `herramientas`
@@ -129,13 +151,15 @@ ALTER TABLE `usuario`
 --
 
 --
+-- Filtros para la tabla `detalle_pedido`
+--
+ALTER TABLE `detalle_pedido`
+  ADD CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON DELETE CASCADE,
+  ADD CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`herramienta`) REFERENCES `herramientas` (`codigo`);
+
+--
 -- Filtros para la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
-  ADD CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`herramienta`) REFERENCES `herramientas` (`codigo`),
   ADD CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`encargado`) REFERENCES `usuario` (`id_user`);
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
