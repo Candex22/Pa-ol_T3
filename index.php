@@ -2,7 +2,7 @@
 
 session_start(); 
 
-
+//hola
 if (!isset($_SESSION['usuario_registrado']) || $_SESSION['usuario_registrado'] !== true) {
     
     header("Location: components/register.php");
