@@ -46,9 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("sssss", $name_user, $nombre, $apellido, $correo, $contrasena);
 
     if ($stmt->execute()) {
-        $_SESSION["usuario_registrado"] = true; // Variable de sesión para indicar éxito
-        header("Location: ../index.php"); // Redirigir al index después del registro
+        $_SESSION["registro_exitoso"] = true; // Variable de sesión para mostrar mensaje en login
+        header("Location: login.php"); // Redirigir al login después del registro
         exit();
+    } else {
+        die("Error al registrar usuario: " . $stmt->error);
     }
 
     // Cerrar la conexión

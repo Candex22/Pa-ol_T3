@@ -1,11 +1,7 @@
 <?php
 session_start();
-
-// Verificar si el usuario está registrado
-if (!isset($_SESSION['usuario_registrado']) || $_SESSION['usuario_registrado'] !== true) {
-    header("Location: login.php");
-    exit();
-}
+require_once('check_session.php');
+?>
 
 // Incluir la conexión a la base de datos
 require_once('../components/tool_management.php');

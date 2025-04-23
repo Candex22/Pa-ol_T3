@@ -1,3 +1,6 @@
+<?php
+$logged_in = isset($_SESSION['usuario_registrado']) && $_SESSION['usuario_registrado'] === true;
+?>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
         <a class="navbar-brand" href="/Pa-ol_T3/index.php">

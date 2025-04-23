@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once('check_session.php');
 
 // Verificar si el usuario está registrado
 if (!isset($_SESSION['usuario_registrado']) || $_SESSION['usuario_registrado'] !== true) {
@@ -8,45 +9,85 @@ if (!isset($_SESSION['usuario_registrado']) || $_SESSION['usuario_registrado'] !
 }
 
 // Incluir la conexión a la base de datos
-require_once('../components/tool_management.php');
+require_once('tool_management.php');
 
 // Función para obtener todos los pedidos
 function getPedidos() {
     $conn = connectDB();
-    
-    $sql = "SELECT p.id_pedido, p.curso, p.retirante, p.fecha_pedido, p.estado, p.fecha_devolucion, 
-                   p.observaciones, u.nombre as nombre_encargado, u.apellido as apellido_encargado
-            FROM pedidos p
-            INNER JOIN usuario u ON p.encargado = u.id_user
-            ORDER BY p.fecha_pedido DESC";
-    
-    $result = $conn->query($sql);
     $pedidos = [];
     
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            // Obtener los detalles (herramientas) de cada pedido
+    try {
+        // Preparar la consulta principal
+        $stmt = $conn->prepare(
+            "SELECT p.id_pedido, p.curso, p.retirante, p.fecha_pedido, p.estado, 
+                    p.fecha_devolucion, p.observaciones, 
+                    u.nombre as nombre_encargado, u.apellido as apellido_encargado 
+             FROM pedidos p 
+             INNER JOIN usuario u ON p.encargado = u.id_user 
+             ORDER BY p.fecha_pedido DESC"
+        );
+        
+        if (!$stmt) {
+            throw new Exception("Error al preparar la consulta principal: " . $conn->error);
+        }
+        
+        // Ejecutar la consulta principal
+        if (!$stmt->execute()) {
+            throw new Exception("Error al ejecutar la consulta principal: " . $stmt->error);
+        }
+        
+        $result = $stmt->get_result();
+        
+        // Preparar la consulta de detalles una sola vez
+        $stmtDetalles = $conn->prepare(
+            "SELECT d.id_detalle, d.cantidad, h.codigo, h.nombre, h.imagen 
+             FROM detalle_pedido d 
+             INNER JOIN herramientas h ON d.herramienta = h.codigo 
+             WHERE d.id_pedido = ?"
+        );
+        
+        if (!$stmtDetalles) {
+            throw new Exception("Error al preparar la consulta de detalles: " . $conn->error);
+        }
+        
+        // Procesar cada pedido
+        while ($row = $result->fetch_assoc()) {
             $pedidoId = $row['id_pedido'];
-            $sqlDetalles = "SELECT d.id_detalle, d.cantidad, h.codigo, h.nombre, h.imagen
-                           FROM detalle_pedido d
-                           INNER JOIN herramientas h ON d.herramienta = h.codigo
-                           WHERE d.id_pedido = $pedidoId";
             
-            $resultDetalles = $conn->query($sqlDetalles);
+            // Obtener detalles del pedido
+            if (!$stmtDetalles->bind_param("i", $pedidoId)) {
+                throw new Exception("Error al vincular parámetro: " . $stmtDetalles->error);
+            }
+            
+            if (!$stmtDetalles->execute()) {
+                throw new Exception("Error al ejecutar consulta de detalles: " . $stmtDetalles->error);
+            }
+            
+            $resultDetalles = $stmtDetalles->get_result();
             $detalles = [];
             
-            if ($resultDetalles->num_rows > 0) {
-                while($detalle = $resultDetalles->fetch_assoc()) {
-                    $detalles[] = $detalle;
-                }
+            while ($detalle = $resultDetalles->fetch_assoc()) {
+                $detalles[] = $detalle;
             }
             
             $row['detalles'] = $detalles;
             $pedidos[] = $row;
         }
+        
+        // Cerrar statements
+        $stmtDetalles->close();
+        $stmt->close();
+        
+    } catch (Exception $e) {
+        // Manejar cualquier error
+        error_log("Error en getPedidos: " . $e->getMessage());
+    } finally {
+        // Asegurarse de cerrar la conexión
+        if ($conn) {
+            $conn->close();
+        }
     }
     
-    $conn->close();
     return $pedidos;
 }
 
@@ -80,8 +121,6 @@ function getCursoText($curso) {
             return $curso;
     }
 }
-
-$logged_in = true; // El usuario está autenticado en este punto
 ?>
 
 <!DOCTYPE html>
@@ -89,11 +128,11 @@ $logged_in = true; // El usuario está autenticado en este punto
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Pedidos - Sistema de Pañol</title>
+    <title>Gestión de Pedidos</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
-    <link rel="stylesheet" href="../styles/style.css">
 </head>
+
 <body>
     <?php include('menu.php'); ?>
 

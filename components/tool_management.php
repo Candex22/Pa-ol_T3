@@ -104,7 +104,7 @@ function deleteTool($codigo) {
     $conn = connectDB();
     
     // First check if tool is used in any orders
-    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM pedidos WHERE herramienta = ?");
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM detalle_pedido WHERE herramienta = ?");
     $stmt->bind_param("i", $codigo);
     $stmt->execute();
     $result = $stmt->get_result();

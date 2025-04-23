@@ -1,13 +1,9 @@
 <?php
-session_start(); // Iniciar sesión
+session_start();
+require_once('check_session.php');
 
-// Verificar si el usuario ha iniciado sesión
-if (isset($_SESSION["correo_electronico"]) && isset($_SESSION["id_usuario"])) {
-    $nickname = $_SESSION["correo_electronico"]; // Puedes cambiar esto si tienes un campo específico para el nickname
-    $mensaje = "Usted está iniciado como: $nickname";
-} else {
-    $mensaje = "Usted no tiene sesión";
-}
+$nickname = $_SESSION["correo_electronico"];
+$mensaje = "Usted está iniciado como: $nickname";
 ?>
 
 <!DOCTYPE html>

@@ -69,6 +69,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
     <div class="login-container">
+        <?php if (isset($_SESSION["registro_exitoso"]) && $_SESSION["registro_exitoso"] === true): ?>
+            <div class="alert alert-success">
+                ¡Registro exitoso! Por favor, inicie sesión con sus credenciales.
+            </div>
+            <?php unset($_SESSION["registro_exitoso"]); ?>
+        <?php endif; ?>
         <h2 class="login-title">Iniciar Sesión</h2>
         <form action="login.php" method="POST">
             <div class="form-group">

@@ -5,7 +5,7 @@ session_start();
 //hola
 if (!isset($_SESSION['usuario_registrado']) || $_SESSION['usuario_registrado'] !== true) {
     
-    header("Location: components/register.php");
+    header("Location: components/login.php");
     exit();
 }
 // Include the tool management module
