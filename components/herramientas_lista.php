@@ -2,6 +2,12 @@
 session_start();
 require_once('check_session.php');
 
+// Verificar si el usuario está registrado
+if (!isset($_SESSION['usuario_registrado']) || $_SESSION['usuario_registrado'] !== true) {
+    header("Location: login.php");
+    exit();
+}
+
 // Include the tool management module
 require_once('tool_management.php');
 
@@ -30,7 +36,6 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
     
     $check_stmt->close();
     $conn->close();
-}
 }
 
 // Get all tools

@@ -1,137 +1,76 @@
 <?php
 session_start();
 require_once('check_session.php');
-?>
 
-// Incluir la conexión a la base de datos
-require_once('../components/tool_management.php');
-
-// Función para obtener todas las herramientas disponibles
-function getHerramientas() {
-    $conn = connectDB();
-    $sql = "SELECT * FROM herramientas WHERE cantidad > 0 ORDER BY nombre";
-    $result = $conn->query($sql);
-    $herramientas = [];
-    
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $herramientas[] = $row;
-        }
-    }
-    
-    $conn->close();
-    return $herramientas;
+// Verificar si el usuario está registrado
+if (!isset($_SESSION['usuario_registrado']) || $_SESSION['usuario_registrado'] !== true) {
+    header("Location: login.php");
+    exit();
 }
 
-// Función para crear un nuevo pedido
-function crearPedido($curso, $retirante, $encargado, $items) {
-    $conn = connectDB();
-    
-    // Iniciar transacción
-    $conn->begin_transaction();
-    
-    try {
-        // Insertar el pedido
-        $stmt = $conn->prepare("INSERT INTO pedidos (curso, retirante, encargado) VALUES (?, ?, ?)");
-        $stmt->bind_param("ssi", $curso, $retirante, $encargado);
-        $stmt->execute();
-        
-        $id_pedido = $conn->insert_id;
-        
-        // Insertar los detalles del pedido y actualizar el inventario
-        foreach ($items as $item) {
-            $herramienta_id = $item['herramienta'];
-            $cantidad = $item['cantidad'];
-            
-            // Verificar stock disponible
-            $stmt = $conn->prepare("SELECT cantidad FROM herramientas WHERE codigo = ?");
-            $stmt->bind_param("i", $herramienta_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $stock = $result->fetch_assoc()['cantidad'];
-            
-            if ($stock < $cantidad) {
-                throw new Exception("Stock insuficiente para la herramienta con código: " . $herramienta_id);
-            }
-            
-            // Insertar detalle
-            $stmt = $conn->prepare("INSERT INTO detalle_pedido (id_pedido, herramienta, cantidad) VALUES (?, ?, ?)");
-            $stmt->bind_param("iii", $id_pedido, $herramienta_id, $cantidad);
-            $stmt->execute();
-            
-            // Actualizar inventario
-            $nueva_cantidad = $stock - $cantidad;
-            $stmt = $conn->prepare("UPDATE herramientas SET cantidad = ? WHERE codigo = ?");
-            $stmt->bind_param("ii", $nueva_cantidad, $herramienta_id);
-            $stmt->execute();
-        }
-        
-        // Confirmar transacción
-        $conn->commit();
-        return true;
-    } catch (Exception $e) {
-        // Revertir cambios en caso de error
-        $conn->rollback();
-        return $e->getMessage();
-    }
-    
-    $conn->close();
-}
+// Incluir archivos necesarios
+require_once('tool_management.php');
+require_once('pedido_form_functions.php');
 
 // Variables para el formulario
 $herramientas = getHerramientas();
 $mensaje = '';
 $tipo_mensaje = '';
 
-// Verificar si se envió el formulario
+// Procesar el formulario si se envía
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validar datos
     $curso = $_POST['curso'];
     $retirante = $_POST['retirante'];
-    $encargado = $_SESSION['usuario_id']; // ID del usuario logueado
+    $items = [];
     
-    // Validar que hay al menos un ítem en el pedido
-    if (!isset($_POST['items']) || count($_POST['items']) === 0) {
-        $mensaje = "Debe seleccionar al menos una herramienta para el pedido.";
+    // Verificar que el ID del usuario esté en la sesión
+    if (!isset($_SESSION['id_usuario'])) {
+        $mensaje = "No se pudo identificar al usuario encargado.";
         $tipo_mensaje = "danger";
     } else {
-        $items = [];
+        $encargado = $_SESSION['id_usuario'];
         
-        // Procesar cada ítem del pedido
-        foreach ($_POST['items'] as $index => $item) {
-            $herramienta = $item['herramienta'];
-            $cantidad = $item['cantidad'];
+        // Validar que hay al menos un ítem en el pedido
+        if (!isset($_POST['items']) || count($_POST['items']) === 0) {
+            $mensaje = "Debe seleccionar al menos una herramienta para el pedido.";
+            $tipo_mensaje = "danger";
+        } else {
+            // Procesar cada ítem del pedido
+            $error = false;
             
-            // Validar cantidad
-            if ($cantidad <= 0) {
-                $mensaje = "La cantidad debe ser mayor a 0.";
-                $tipo_mensaje = "danger";
-                break;
+            foreach ($_POST['items'] as $index => $item) {
+                $herramienta = $item['herramienta'];
+                $cantidad = $item['cantidad'];
+                
+                // Validar cantidad
+                if ($cantidad <= 0) {
+                    $mensaje = "La cantidad debe ser mayor a 0.";
+                    $tipo_mensaje = "danger";
+                    $error = true;
+                    break;
+                }
+                
+                $items[] = [
+                    'herramienta' => $herramienta,
+                    'cantidad' => $cantidad
+                ];
             }
             
-            $items[] = [
-                'herramienta' => $herramienta,
-                'cantidad' => $cantidad
-            ];
-        }
-        
-        // Si no hay errores, crear el pedido
-        if (empty($mensaje)) {
-            $resultado = crearPedido($curso, $retirante, $encargado, $items);
-            
-            if ($resultado === true) {
-                // Redireccionar a la lista de pedidos
-                header("Location: pedidos_lista.php?success=1");
-                exit();
-            } else {
-                $mensaje = "Error al crear el pedido: " . $resultado;
-                $tipo_mensaje = "danger";
+            // Si no hay errores, crear el pedido
+            if (!$error) {
+                $resultado = crearPedido($curso, $retirante, $encargado, $items);
+                if ($resultado['success']) {
+                    header("Location: pedidos_lista.php?success=1");
+                    exit();
+                } else {
+                    $mensaje = $resultado['mensaje'];
+                    $tipo_mensaje = "danger";
+                }
             }
         }
     }
 }
-
-$logged_in = true; // El usuario está autenticado en este punto
 ?>
 
 <!DOCTYPE html>
@@ -378,7 +317,7 @@ $logged_in = true; // El usuario está autenticado en este punto
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div<div class="mb-3">
+                            <div class="mb-3">
                                 <label class="form-label">Vista previa</label>
                                 <div class="preview-container text-center">
                                     <i class="fas fa-tools fa-2x text-secondary"></i>
