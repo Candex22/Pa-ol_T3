@@ -2,6 +2,19 @@
     background-color: #f8f9fa;
     padding: 2rem 0;
     margin-bottom: 2rem;
+    
+}
+
+.hero-section .container .row {
+    justify-content: flex-end;
+    margin-left: 3vw;
+}
+
+@media (max-width: 992px) {
+    .hero-section .container .row {
+        margin-left: 0;
+        justify-content: center;
+    }
 }
 .hero-image-right {
     position: relative;
