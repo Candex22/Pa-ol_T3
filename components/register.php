@@ -21,17 +21,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Validar campos vacíos
     if (empty($nombre) || empty($apellido) || empty($name_user) || empty($correo) || empty($contrasena)) {
-        die("Error: Todos los campos son obligatorios.");
+        $_SESSION["register_error"] = "Todos los campos son obligatorios.";
+        header("Location: register.php");
+        exit();
     }
 
     // Validar formato de correo
     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-        die("Error: Formato de correo electrónico no válido.");
+        $_SESSION["register_error"] = "Formato de correo electrónico no válido.";
+        header("Location: register.php");
+        exit();
     }
 
     // Validar longitud de contraseña
     if (strlen($contrasena) <= 4) {
-        die("Error: La contraseña debe tener más de 4 caracteres.");
+        $_SESSION["register_error"] = "La contraseña debe tener más de 4 caracteres.";
+        header("Location: register.php");
+        exit();
     }
 
     // Prepare statement para evitar inyección SQL
@@ -67,7 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Pañol - Registro</title>
     <link rel="stylesheet" href="../styles/register.css">
-
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../scripts/alertas.js"></script>
 </head>
 <body>
 
@@ -78,11 +86,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form action="register.php" method="POST">
                 <div class="form-group">
                     <label class="form-label">Nombre</label>
-                    <input type="text" class="form-control" placeholder="Ingrese su nombre completo" name="nombre">
+                    <input type="text" class="form-control" placeholder="Ingrese su nombre" name="nombre" id="nombre" maxlength="20" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]{1,20}" title="Solo letras, máximo 20 caracteres" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Apellido</label>
-                    <input type="text" class="form-control" placeholder="Ingrese su apellido completo" name="apellido">
+                    <input type="text" class="form-control" placeholder="Ingrese su apellido" name="apellido" id="apellido" maxlength="20" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]{1,20}" title="Solo letras, máximo 20 caracteres" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Nombre de usuario</label>
@@ -106,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Registrarse</button>
-                <button type="button" class="btn btn-warning">Cancelar</button>
+                <button type="button" class="btn btn-warning" id="btn-limpiar">Limpiar</button>
                     
                 </div>
                 
@@ -124,6 +132,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             </form>
         </div>
+    <?php if (isset($_SESSION["register_error"])): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de registro',
+                    text: '<?php echo $_SESSION["register_error"]; ?>',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Aceptar'
+                });
+            });
+        </script>
+        <?php unset($_SESSION["register_error"]); ?>
+    <?php endif; ?>
     </div>
 </body>
 </html>

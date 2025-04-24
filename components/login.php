@@ -11,18 +11,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Validar campos vacíos
     if (empty($correo) || empty($contrasena)) {
-        die("Error: Todos los campos son obligatorios.");
+        $_SESSION["login_error"] = "Todos los campos son obligatorios.";
+        header("Location: login.php");
+        exit();
     }
 
     // Validar formato de correo
     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-        die("Error: Formato de correo electrónico no válido.");
+        $_SESSION["login_error"] = "Formato de correo electrónico no válido.";
+        header("Location: login.php");
+        exit();
     }
 
     // Consultar el usuario en la base de datos
     $stmt = $conn->prepare("SELECT id_user, contrasena FROM usuario WHERE correo_electronico = ?");
     if (!$stmt) {
-        die("Error en la preparación: " . $conn->error);
+        $_SESSION["login_error"] = "Error en la preparación: " . $conn->error;
+        header("Location: login.php");
+        exit();
     }
 
     $stmt->bind_param("s", $correo);
@@ -44,10 +50,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: ../index.php");
             exit();
         } else {
-            die("Error: Contraseña incorrecta.");
+            $_SESSION["login_error"] = "Contraseña incorrecta.";
+            header("Location: login.php");
+            exit();
         }
     } else {
-        die("Error: No se encontró una cuenta con ese correo electrónico.");
+        $_SESSION["login_error"] = "No se encontró una cuenta con ese correo electrónico.";
+        header("Location: login.php");
+        exit();
     }
 
     $stmt->close();
@@ -61,34 +71,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link type="text">
-    <link rel="stylesheet" href="../styles/login.css">
+    <link rel="stylesheet" href="../styles/register.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../scripts/alertas.js"></script>
     <title>Sistema de Pañol - Iniciar Sesión</title>
 
 </head>
 
 <body>
-    <div class="login-container">
+    <div class="container">
+        <div class="form-container">
         <?php if (isset($_SESSION["registro_exitoso"]) && $_SESSION["registro_exitoso"] === true): ?>
-            <div class="alert alert-success">
-                ¡Registro exitoso! Por favor, inicie sesión con sus credenciales.
-            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Registro exitoso!',
+                        text: 'Por favor, inicie sesión con sus credenciales.',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Aceptar'
+                    });
+                });
+            </script>
             <?php unset($_SESSION["registro_exitoso"]); ?>
         <?php endif; ?>
-        <h2 class="login-title">Iniciar Sesión</h2>
+        <?php if (isset($_SESSION["login_error"])): ?>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de inicio de sesión',
+                        text: '<?php echo $_SESSION["login_error"]; ?>',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'Aceptar'
+                    });
+                });
+            </script>
+            <?php unset($_SESSION["login_error"]); ?>
+        <?php endif; ?>
+        <h2 class="form-title">Iniciar Sesión</h2>
         <form action="login.php" method="POST">
             <div class="form-group">
-                <label class="form-label" for="correo_electronico">Correo Electrónico</label>
-                <input type="email" class="form-control" id="correo_electronico" name="correo_electronico" placeholder="Ingrese su correo electrónico">
+                <label class="form-label" for="correo_electronico">Correo electrónico</label>
+                <input type="email" class="form-control" id="correo_electronico" name="correo_electronico" placeholder="Ingrese su correo electrónico" required>
             </div>
             <div class="form-group">
                 <label class="form-label" for="contrasena">Contraseña</label>
-                <input type="password" class="form-control" id="contrasena" name="contrasena" placeholder="Ingrese su contraseña">
+                <input type="password" class="form-control" id="contrasena" name="contrasena" placeholder="Ingrese su contraseña" required>
             </div>
-            <button type="submit" class="btn">Iniciar Sesión</button>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+            </div>
         </form>
         <div class="form-footer">
-            ¿No tiene una cuenta? <a href="./register.php">Regístrese aquí</a>
+            ¿No tiene una cuenta? <a href="./register.php">Registrarse</a>
+        </div>
         </div>
     </div>
 </body>
