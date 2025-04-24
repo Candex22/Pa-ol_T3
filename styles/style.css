@@ -3,6 +3,25 @@
     padding: 2rem 0;
     margin-bottom: 2rem;
 }
+.hero-image-right {
+    position: relative;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+    padding-right: 0;
+}
+.hero-image-right img {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-right: 0;
+    padding-right: 0;
+    display: flex;
+}
+
 .stat-card {
     text-align: center;
     padding: 1.5rem;

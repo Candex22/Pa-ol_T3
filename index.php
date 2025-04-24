@@ -67,8 +67,8 @@ $logged_in = true; // Replace with actual authentication check
                     <h1 class="display-4">Sistema de Gestión de Pañol</h1>
                     <p class="lead">Administra eficientemente el inventario de herramientas y los préstamos a diferentes cursos.</p>
                 </div>
-                <div class="col-lg-6">
-                    <img src="https://via.placeholder.com/600x400" alt="Pañol" class="img-fluid rounded">
+                <div class="col-lg-6 hero-image-right">
+                    <img src="https://static.wixstatic.com/media/dc2686_0d5c07e6e1ad4b608b0bfb67a3bdc7dc~mv2_d_1557_2272_s_2.png/v1/crop/x_0,y_185,w_1557,h_1902/fill/w_160,h_180,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/dc2686_0d5c07e6e1ad4b608b0bfb67a3bdc7dc~mv2_d_1557_2272_s_2.png" alt="Pañol" class="img-fluid rounded">
                 </div>
             </div>
         </div>
