@@ -48,6 +48,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
+    // Validar existencia previa en la base de datos
+    $stmt_check = $conn->prepare("SELECT * FROM usuario WHERE correo_electronico = ? OR name_user = ? OR nombre = ? OR apellido = ? LIMIT 1");
+    $stmt_check->bind_param("ssss", $correo, $name_user, $nombre, $apellido);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
+    if ($result_check && $result_check->num_rows > 0) {
+        $usuario_existente = $result_check->fetch_assoc();
+        if ($usuario_existente['correo_electronico'] === $correo) {
+            $_SESSION["register_error"] = "El correo electrónico ya está registrado.";
+        } elseif ($usuario_existente['name_user'] === $name_user) {
+            $_SESSION["register_error"] = "El nombre de usuario ya está registrado.";
+        } elseif ($usuario_existente['apellido'] === $apellido) {
+            $_SESSION["register_error"] = "El apellido ya está registrado.";
+        } else {
+            $_SESSION["register_error"] = "Usuario ya existente.";
+        }
+        $stmt_check->close();
+        header("Location: register.php");
+        exit();
+    }
+    $stmt_check->close();
+
     // Prepare statement para evitar inyección SQL
     $stmt = $conn->prepare("INSERT INTO usuario (name_user, nombre, apellido, correo_electronico, contrasena) VALUES (?, ?, ?, ?, ?)");
 
