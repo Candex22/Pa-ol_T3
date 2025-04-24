@@ -18,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name_user = isset($_POST["nickname"]) ? $_POST["nickname"] : "";
     $correo = isset($_POST["correo_electronico"]) ? $_POST["correo_electronico"] : "";
     $contrasena = isset($_POST["contrasena"]) ? $_POST["contrasena"] : "";
+    $confir_contrasena = isset($_POST["confir_contrasena"]) ? $_POST["confir_contrasena"] : "";
 
     // Validar campos vacíos
     if (empty($nombre) || empty($apellido) || empty($name_user) || empty($correo) || empty($contrasena)) {
@@ -29,6 +30,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validar formato de correo
     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
         $_SESSION["register_error"] = "Formato de correo electrónico no válido.";
+        header("Location: register.php");
+        exit();
+    }
+
+    // Validar que las contraseñas coincidan
+    if ($contrasena !== $confir_contrasena) {
+        $_SESSION["register_error"] = "Las contraseñas no coinciden.";
         header("Location: register.php");
         exit();
     }
