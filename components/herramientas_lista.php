@@ -1,4 +1,13 @@
 <?php
+session_start();
+require_once('check_session.php');
+
+// Verificar si el usuario está registrado
+if (!isset($_SESSION['usuario_registrado']) || $_SESSION['usuario_registrado'] !== true) {
+    header("Location: login.php");
+    exit();
+}
+
 // Include the tool management module
 require_once('tool_management.php');
 
@@ -6,11 +15,27 @@ require_once('tool_management.php');
 $message = '';
 if (isset($_GET['delete']) && !empty($_GET['delete'])) {
     $delete_id = $_GET['delete'];
-    if (deleteTool($delete_id)) {
-        $message = "Herramienta eliminada correctamente.";
+    $conn = connectDB();
+    
+    // Verificar si la herramienta está en uso
+    $check_stmt = $conn->prepare("SELECT COUNT(*) as count FROM detalle_pedido WHERE herramienta = ?");
+    $check_stmt->bind_param("i", $delete_id);
+    $check_stmt->execute();
+    $check_result = $check_stmt->get_result();
+    $check_row = $check_result->fetch_assoc();
+    
+    if ($check_row['count'] > 0) {
+        $message = "Error: No se puede eliminar la herramienta porque está siendo utilizada en uno o más pedidos.";
     } else {
-        $message = "Error al eliminar la herramienta. Puede estar asociada a pedidos existentes.";
+        if (deleteTool($delete_id)) {
+            $message = "Herramienta eliminada correctamente.";
+        } else {
+            $message = "Error al eliminar la herramienta. Por favor, inténtelo nuevamente.";
+        }
     }
+    
+    $check_stmt->close();
+    $conn->close();
 }
 
 // Get all tools
@@ -36,7 +61,7 @@ $tools = getAllTools();
 </head>
 
 <body>
-    <?php include('menu.php'); ?>
+    <?php include(__DIR__ . '/menu.php'); ?>
 
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">

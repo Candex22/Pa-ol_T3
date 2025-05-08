@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-04-2025 a las 02:27:58
+-- Tiempo de generación: 15-04-2025 a las 07:31:40
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -18,6 +18,19 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `detalle_pedido`
+--
+
+CREATE TABLE `detalle_pedido` (
+  `id_detalle` int(11) NOT NULL,
+  `id_pedido` int(11) NOT NULL,
+  `herramienta` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `herramientas`
 --
 
@@ -28,6 +41,13 @@ CREATE TABLE `herramientas` (
   `cantidad` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `herramientas`
+--
+
+INSERT INTO `herramientas` (`codigo`, `nombre`, `imagen`, `cantidad`) VALUES
+(5, 'destornillador', 'uploads/tools/67ede5491f389.jpg', 15);
+
 -- --------------------------------------------------------
 
 --
@@ -36,11 +56,13 @@ CREATE TABLE `herramientas` (
 
 CREATE TABLE `pedidos` (
   `id_pedido` int(11) NOT NULL,
-  `herramienta` int(11) NOT NULL,
   `curso` enum('primero','segundo','tercero','cuarto') NOT NULL,
   `retirante` varchar(30) NOT NULL,
   `encargado` int(11) NOT NULL,
-  `fecha_pedido` timestamp NOT NULL DEFAULT current_timestamp()
+  `fecha_pedido` timestamp NOT NULL DEFAULT current_timestamp(),
+  `estado` enum('prestado','devuelto') NOT NULL DEFAULT 'prestado',
+  `observaciones` text DEFAULT NULL,
+  `fecha_devolucion` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -52,12 +74,30 @@ CREATE TABLE `pedidos` (
 CREATE TABLE `usuario` (
   `id_user` int(11) NOT NULL,
   `name_user` varchar(30) NOT NULL,
-  `contraseña` varchar(20) NOT NULL
+  `nombre` varchar(50) NOT NULL,
+  `apellido` varchar(50) NOT NULL,
+  `correo_electronico` varchar(100) NOT NULL,
+  `contrasena` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuario`
+--
+
+INSERT INTO `usuario` (`id_user`, `name_user`, `nombre`, `apellido`, `correo_electronico`, `contrasena`) VALUES
+(4, 'josefina532124', 'Ibarra', 'Guillermo', 'josefina42@gmail.com', 'pepe123');
 
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `detalle_pedido`
+--
+ALTER TABLE `detalle_pedido`
+  ADD PRIMARY KEY (`id_detalle`),
+  ADD KEY `id_pedido` (`id_pedido`),
+  ADD KEY `herramienta` (`herramienta`);
 
 --
 -- Indices de la tabla `herramientas`
@@ -70,7 +110,6 @@ ALTER TABLE `herramientas`
 --
 ALTER TABLE `pedidos`
   ADD PRIMARY KEY (`id_pedido`),
-  ADD KEY `herramienta` (`herramienta`),
   ADD KEY `encargado` (`encargado`);
 
 --
@@ -84,10 +123,16 @@ ALTER TABLE `usuario`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `detalle_pedido`
+--
+ALTER TABLE `detalle_pedido`
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `herramientas`
 --
 ALTER TABLE `herramientas`
-  MODIFY `codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `pedidos`
@@ -96,13 +141,25 @@ ALTER TABLE `pedidos`
   MODIFY `id_pedido` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `detalle_pedido`
+--
+ALTER TABLE `detalle_pedido`
+  ADD CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON DELETE CASCADE,
+  ADD CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`herramienta`) REFERENCES `herramientas` (`codigo`);
 
 --
 -- Filtros para la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
-  ADD CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`herramienta`) REFERENCES `herramientas` (`codigo`),
   ADD CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`encargado`) REFERENCES `usuario` (`id_user`);
 COMMIT;

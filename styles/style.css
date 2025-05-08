@@ -2,7 +2,39 @@
     background-color: #f8f9fa;
     padding: 2rem 0;
     margin-bottom: 2rem;
+    
 }
+
+.hero-section .container .row {
+    justify-content: flex-end;
+    margin-left: 3vw;
+}
+
+@media (max-width: 992px) {
+    .hero-section .container .row {
+        margin-left: 0;
+        justify-content: center;
+    }
+}
+.hero-image-right {
+    position: relative;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+    padding-right: 0;
+}
+.hero-image-right img {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-right: 0;
+    padding-right: 0;
+    display: flex;
+}
+
 .stat-card {
     text-align: center;
     padding: 1.5rem;
@@ -38,4 +70,36 @@
 .menu-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
+}
+
+/* Estilos para el modal de perfil */
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    background-color: #007bff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.initials {
+    text-transform: uppercase;
+}
+
+.user-info {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.modal-content {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }

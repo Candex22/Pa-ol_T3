@@ -1,9 +1,16 @@
 <?php
-session_start(); // Mover session_start() al inicio del archivo
+session_start(); // Iniciar la sesión al comienzo del archivo
+
+// Verificar si el usuario ya está registrado
+if (isset($_SESSION['usuario_registrado']) && $_SESSION['usuario_registrado'] === true) {
+    header("Location: ../index.php"); // Redirigir al index si ya está registrado
+    exit();
+}
 
 require_once('tool_management.php');
 
 $conn = connectDB();
+
 // Verificar si el formulario fue enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre = isset($_POST["nombre"]) ? $_POST["nombre"] : "";
@@ -11,23 +18,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name_user = isset($_POST["nickname"]) ? $_POST["nickname"] : "";
     $correo = isset($_POST["correo_electronico"]) ? $_POST["correo_electronico"] : "";
     $contrasena = isset($_POST["contrasena"]) ? $_POST["contrasena"] : "";
+    $confir_contrasena = isset($_POST["confir_contrasena"]) ? $_POST["confir_contrasena"] : "";
 
     // Validar campos vacíos
     if (empty($nombre) || empty($apellido) || empty($name_user) || empty($correo) || empty($contrasena)) {
-        die("Error: Todos los campos son obligatorios.");
+        $_SESSION["register_error"] = "Todos los campos son obligatorios.";
+        header("Location: register.php");
+        exit();
     }
 
     // Validar formato de correo
     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-        die("Error: Formato de correo electrónico no válido.");
+        $_SESSION["register_error"] = "Formato de correo electrónico no válido.";
+        header("Location: register.php");
+        exit();
+    }
+
+    // Validar que las contraseñas coincidan
+    if ($contrasena !== $confir_contrasena) {
+        $_SESSION["register_error"] = "Las contraseñas no coinciden.";
+        header("Location: register.php");
+        exit();
     }
 
     // Validar longitud de contraseña
     if (strlen($contrasena) <= 4) {
-        die("Error: La contraseña debe tener más de 4 caracteres.");
+        $_SESSION["register_error"] = "La contraseña debe tener más de 4 caracteres.";
+        header("Location: register.php");
+        exit();
     }
 
-
+    // Validar existencia previa en la base de datos
+    $stmt_check = $conn->prepare("SELECT * FROM usuario WHERE correo_electronico = ? OR name_user = ? OR nombre = ? OR apellido = ? LIMIT 1");
+    $stmt_check->bind_param("ssss", $correo, $name_user, $nombre, $apellido);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
+    if ($result_check && $result_check->num_rows > 0) {
+        $usuario_existente = $result_check->fetch_assoc();
+        if ($usuario_existente['correo_electronico'] === $correo) {
+            $_SESSION["register_error"] = "El correo electrónico ya está registrado.";
+        } elseif ($usuario_existente['name_user'] === $name_user) {
+            $_SESSION["register_error"] = "El nombre de usuario ya está registrado.";
+        } elseif ($usuario_existente['apellido'] === $apellido) {
+            $_SESSION["register_error"] = "El apellido ya está registrado.";
+        } else {
+            $_SESSION["register_error"] = "Usuario ya existente.";
+        }
+        $stmt_check->close();
+        header("Location: register.php");
+        exit();
+    }
+    $stmt_check->close();
 
     // Prepare statement para evitar inyección SQL
     $stmt = $conn->prepare("INSERT INTO usuario (name_user, nombre, apellido, correo_electronico, contrasena) VALUES (?, ?, ?, ?, ?)");
@@ -41,9 +82,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("sssss", $name_user, $nombre, $apellido, $correo, $contrasena);
 
     if ($stmt->execute()) {
-        $_SESSION["registro_exitoso"] = true; // Variable de sesión para indicar éxito
-        header("Location: register.php"); // Redirigir para evitar reenvío del formulario
+        $_SESSION["registro_exitoso"] = true; // Variable de sesión para mostrar mensaje en login
+        header("Location: login.php"); // Redirigir al login después del registro
         exit();
+    } else {
+        die("Error al registrar usuario: " . $stmt->error);
     }
 
     // Cerrar la conexión
@@ -60,14 +103,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Pañol - Registro</title>
     <link rel="stylesheet" href="../styles/register.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
-    <link rel="stylesheet" href="styles/style.css">
-    <?php include('menu.php'); ?>
-
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../scripts/alertas.js"></script>
 </head>
 <body>
-
 
     <div class="container">
         <div class="form-container">
@@ -76,11 +116,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form action="register.php" method="POST">
                 <div class="form-group">
                     <label class="form-label">Nombre</label>
-                    <input type="text" class="form-control" placeholder="Ingrese su nombre completo" name="nombre">
+                    <input type="text" class="form-control" placeholder="Ingrese su nombre" name="nombre" id="nombre" maxlength="20" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]{1,20}" title="Solo letras, máximo 20 caracteres" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Apellido</label>
-                    <input type="text" class="form-control" placeholder="Ingrese su apellido completo" name="apellido">
+                    <input type="text" class="form-control" placeholder="Ingrese su apellido" name="apellido" id="apellido" maxlength="20" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]{1,20}" title="Solo letras, máximo 20 caracteres" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Nombre de usuario</label>
@@ -103,12 +143,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-warning">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                <button type="submit" class="btn btn-primary">Registrarse</button>
+                <button type="button" class="btn btn-warning" id="btn-limpiar">Limpiar</button>
+                    
                 </div>
                 
                 <div class="form-footer">
-                    ¿tiene cuenta? <a href="login.php">Iniciarse</a>
+                    ¿Ya tiene una cuenta? <a href="./login.php">Iniciar sesión</a>
                 </div>
                 <?php
                 if (isset($_SESSION["registro_exitoso"]) && $_SESSION["registro_exitoso"] == true) {
@@ -121,6 +162,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             </form>
         </div>
+    <?php if (isset($_SESSION["register_error"])): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de registro',
+                    text: '<?php echo $_SESSION["register_error"]; ?>',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Aceptar'
+                });
+            });
+        </script>
+        <?php unset($_SESSION["register_error"]); ?>
+    <?php endif; ?>
     </div>
 </body>
 </html>

@@ -1,4 +1,6 @@
 <?php
+session_start();
+require_once('check_session.php');
 // Include the tool management module
 require_once('tool_management.php');
 
