@@ -49,8 +49,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Validar existencia previa en la base de datos
-    $stmt_check = $conn->prepare("SELECT * FROM usuario WHERE correo_electronico = ? OR name_user = ? OR nombre = ? OR apellido = ? LIMIT 1");
-    $stmt_check->bind_param("ssss", $correo, $name_user, $nombre, $apellido);
+    $stmt_check = $conn->prepare("SELECT * FROM usuario WHERE correo_electronico = ? OR name_user = ? LIMIT 1");
+    $stmt_check->bind_param("ss", $correo, $name_user);
     $stmt_check->execute();
     $result_check = $stmt_check->get_result();
     if ($result_check && $result_check->num_rows > 0) {
@@ -59,8 +59,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["register_error"] = "El correo electrónico ya está registrado.";
         } elseif ($usuario_existente['name_user'] === $name_user) {
             $_SESSION["register_error"] = "El nombre de usuario ya está registrado.";
-        } elseif ($usuario_existente['apellido'] === $apellido) {
-            $_SESSION["register_error"] = "El apellido ya está registrado.";
         } else {
             $_SESSION["register_error"] = "Usuario ya existente.";
         }
@@ -70,16 +68,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $stmt_check->close();
 
+    // Verificar si ya existe algún usuario en la tabla
+    $check_first = $conn->query("SELECT COUNT(*) as total FROM usuario");
+    $row = $check_first->fetch_assoc();
+    $total_users = $row['total'];
+
+    // El primer usuario será administrador y estará activo automáticamente
+    $rol = 'usuario';
+    $estado = 'pendiente';
+    
+    if ($total_users == 0) {
+        $rol = 'administrador';
+        $estado = 'activo';
+    }
+
     // Prepare statement para evitar inyección SQL
-    $stmt = $conn->prepare("INSERT INTO usuario (name_user, nombre, apellido, correo_electronico, contrasena) VALUES (?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO usuario (name_user, nombre, apellido, correo_electronico, contrasena, rol, estado) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
     // Verifica si la consulta es válida
     if (!$stmt) {
         die("Error en la preparación: " . $conn->error);
     }
 
-    // Bind de parámetros (todos son strings)
-    $stmt->bind_param("sssss", $name_user, $nombre, $apellido, $correo, $contrasena);
+    // Bind de parámetros
+    $stmt->bind_param("sssssss", $name_user, $nombre, $apellido, $correo, $contrasena, $rol, $estado);
 
     if ($stmt->execute()) {
         $_SESSION["registro_exitoso"] = true; // Variable de sesión para mostrar mensaje en login
@@ -151,15 +163,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="form-footer">
                     ¿Ya tiene una cuenta? <a href="./login.php">Iniciar sesión</a>
                 </div>
-                <?php
-                if (isset($_SESSION["registro_exitoso"]) && $_SESSION["registro_exitoso"] == true) {
-                    echo '<div class="registro-exitoso">';
-
-                    echo '</div>';
-                    unset($_SESSION["registro_exitoso"]); // Eliminar la variable para que no se muestre siempre
-                }
-    ?>
-
             </form>
         </div>
     <?php if (isset($_SESSION["register_error"])): ?>

@@ -1,0 +1,139 @@
+.admin-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.admin-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.users-table th,
+.users-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.users-table th {
+    background-color: #f8f9fa;
+    color: #333;
+    font-weight: 600;
+}
+
+.users-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: white;
+}
+
+.badge-admin {
+    background-color: #007bff;
+}
+
+.badge-user {
+    background-color: #6c757d;
+}
+
+.badge-active {
+    background-color: #28a745;
+}
+
+.badge-inactive {
+    background-color: #dc3545;
+}
+
+.badge-pending {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-activate {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.btn-activate:hover {
+    background-color: #218838;
+}
+
+.btn-deactivate {
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.btn-deactivate:hover {
+    background-color: #e0a800;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 15px;
+}

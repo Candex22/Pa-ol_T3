@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Consultar el usuario en la base de datos
-    $stmt = $conn->prepare("SELECT id_user, contrasena FROM usuario WHERE correo_electronico = ?");
+    $stmt = $conn->prepare("SELECT id_user, contrasena, rol, estado, name_user FROM usuario WHERE correo_electronico = ?");
     if (!$stmt) {
         $_SESSION["login_error"] = "Error en la preparación: " . $conn->error;
         header("Location: login.php");
@@ -36,18 +36,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id_usuario, $stored_password);
+        $stmt->bind_result($id_usuario, $stored_password, $rol, $estado, $name_user);
         $stmt->fetch();
 
         // Verificar la contraseña ingresada con la almacenada
         if ($contrasena === $stored_password) {
+            // Verificar el estado del usuario
+            if ($estado === 'pendiente') {
+                $_SESSION["login_error"] = "Su cuenta está pendiente de aprobación por un administrador.";
+                header("Location: login.php");
+                exit();
+            } elseif ($estado === 'inactivo') {
+                $_SESSION["login_error"] = "Su cuenta ha sido desactivada. Contacte con un administrador.";
+                header("Location: login.php");
+                exit();
+            }
+            
             // Iniciar sesión
             $_SESSION["usuario_registrado"] = true; // Indicar que el usuario está autenticado
             $_SESSION["id_usuario"] = $id_usuario;
             $_SESSION["correo_electronico"] = $correo;
+            $_SESSION["rol"] = $rol; // Guardar el rol en la sesión
+            $_SESSION["name_user"] = $name_user; // Guardar el nombre de usuario en la sesión
 
-            // Redirigir al usuario a la página principal
-            header("Location: ../index.php");
+            // Redirigir según el rol
+            if ($rol === 'administrador') {
+                header("Location: admin_panel.php");
+            } else {
+                header("Location: ../index.php");
+            }
             exit();
         } else {
             $_SESSION["login_error"] = "Contraseña incorrecta.";
@@ -87,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     Swal.fire({
                         icon: 'success',
                         title: '¡Registro exitoso!',
-                        text: 'Por favor, inicie sesión con sus credenciales.',
+                        text: 'Su cuenta está pendiente de aprobación por un administrador.',
                         confirmButtonColor: '#3085d6',
                         confirmButtonText: 'Aceptar'
                     });
