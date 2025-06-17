@@ -82,7 +82,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $estado = 'activo';
     }
 
+    // ¡Aquí es donde hasheamos la contraseña!
+    // Usamos PASSWORD_DEFAULT para el algoritmo recomendado (actualmente bcrypt)
+    // y password_hash se encarga del salting automáticamente.
+    $hashed_password = password_hash($contrasena, PASSWORD_DEFAULT);
+
     // Prepare statement para evitar inyección SQL
+    // Ahora insertamos la contraseña hasheada
     $stmt = $conn->prepare("INSERT INTO usuario (name_user, nombre, apellido, correo_electronico, contrasena, rol, estado) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
     // Verifica si la consulta es válida
@@ -90,8 +96,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Error en la preparación: " . $conn->error);
     }
 
-    // Bind de parámetros
-    $stmt->bind_param("sssssss", $name_user, $nombre, $apellido, $correo, $contrasena, $rol, $estado);
+    // Bind de parámetros - usa $hashed_password en lugar de $contrasena
+    $stmt->bind_param("sssssss", $name_user, $nombre, $apellido, $correo, $hashed_password, $rol, $estado);
 
     if ($stmt->execute()) {
         $_SESSION["registro_exitoso"] = true; // Variable de sesión para mostrar mensaje en login
@@ -107,7 +113,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -115,7 +120,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Pañol - Registro</title>
     <link rel="stylesheet" href="../styles/register.css">
-    <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../scripts/alertas.js"></script>
 </head>
