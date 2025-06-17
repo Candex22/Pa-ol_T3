@@ -1,10 +1,10 @@
 <?php
 // Database connection
 function connectDB() {
-    $servername = "localhost";
-    $username = "root";  // Change as needed
-    $password = "";      // Change as needed
-    $dbname = "panol";
+    $servername = "sql304.infinityfree.com"; // Changed to your new host name
+    $username = "if0_39250157";      // Changed to your new user name
+    $password = "Tecnica32025"; // *** YOU MUST REPLACE THIS WITH YOUR ACTUAL VPANEL PASSWORD ***
+    $dbname = "if0_39250157_panol";  // Changed to your new DB name
 
     // Create connection
     $conn = new mysqli($servername, $username, $password, $dbname);
