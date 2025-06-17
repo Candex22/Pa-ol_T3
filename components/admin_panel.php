@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once('check_session.php');
 require_once('admin_check.php');
 
 // Contar el número de usuarios pendientes

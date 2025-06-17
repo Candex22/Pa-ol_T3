@@ -1,6 +1,5 @@
 <?php
-session_start(); // Iniciar sesión al comienzo del archivo
-
+session_start();
 require_once('tool_management.php');
 
 $conn = connectDB();
@@ -9,9 +8,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $correo = isset($_POST["correo_electronico"]) ? $_POST["correo_electronico"] : "";
     $contrasena = isset($_POST["contrasena"]) ? $_POST["contrasena"] : "";
 
+    // DEBUG: Log de entrada
+    error_log("=== LOGIN ATTEMPT ===");
+    error_log("Email: " . $correo);
+    error_log("Password length: " . strlen($contrasena));
+
     // Validar campos vacíos
     if (empty($correo) || empty($contrasena)) {
         $_SESSION["login_error"] = "Todos los campos son obligatorios.";
+        error_log("ERROR: Campos vacíos");
         header("Location: login.php");
         exit();
     }
@@ -19,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validar formato de correo
     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
         $_SESSION["login_error"] = "Formato de correo electrónico no válido.";
+        error_log("ERROR: Email inválido");
         header("Location: login.php");
         exit();
     }
@@ -27,6 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare("SELECT id_user, contrasena, rol, estado, name_user FROM usuario WHERE correo_electronico = ?");
     if (!$stmt) {
         $_SESSION["login_error"] = "Error en la preparación: " . $conn->error;
+        error_log("ERROR: Preparación SQL falló");
         header("Location: login.php");
         exit();
     }
@@ -35,44 +42,75 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $stmt->store_result();
 
+    error_log("Rows found: " . $stmt->num_rows);
+
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($id_usuario, $stored_password, $rol, $estado, $name_user);
         $stmt->fetch();
 
-        // Verificar la contraseña ingresada con la almacenada
-        if ($contrasena === $stored_password) {
+        // DEBUG: Log de datos encontrados
+        error_log("User found - ID: " . $id_usuario);
+        error_log("Stored password hash: " . substr($stored_password, 0, 30) . "...");
+        error_log("Role: " . $rol);
+        error_log("Status: " . $estado);
+        error_log("Password hash length: " . strlen($stored_password));
+
+        // VERIFICAR CONTRASEÑA
+        $password_check = password_verify($contrasena, $stored_password);
+        error_log("Password verify result: " . ($password_check ? "TRUE" : "FALSE"));
+
+        if ($password_check) {
+            error_log("Password verified successfully");
+            
             // Verificar el estado del usuario
             if ($estado === 'pendiente') {
                 $_SESSION["login_error"] = "Su cuenta está pendiente de aprobación por un administrador.";
+                error_log("ERROR: Account pending");
                 header("Location: login.php");
                 exit();
             } elseif ($estado === 'inactivo') {
                 $_SESSION["login_error"] = "Su cuenta ha sido desactivada. Contacte con un administrador.";
+                error_log("ERROR: Account inactive");
+                header("Location: login.php");
+                exit();
+            } elseif ($estado !== 'activo') {
+                $_SESSION["login_error"] = "Estado de cuenta inválido: " . $estado;
+                error_log("ERROR: Invalid status: " . $estado);
                 header("Location: login.php");
                 exit();
             }
             
             // Iniciar sesión
-            $_SESSION["usuario_registrado"] = true; // Indicar que el usuario está autenticado
+            $_SESSION["usuario_registrado"] = true;
             $_SESSION["id_usuario"] = $id_usuario;
             $_SESSION["correo_electronico"] = $correo;
-            $_SESSION["rol"] = $rol; // Guardar el rol en la sesión
-            $_SESSION["name_user"] = $name_user; // Guardar el nombre de usuario en la sesión
+            $_SESSION["rol"] = $rol;
+            $_SESSION["name_user"] = $name_user;
+
+            error_log("Session started successfully for user: " . $name_user);
 
             // Redirigir según el rol
             if ($rol === 'administrador') {
+                error_log("Redirecting to admin panel");
                 header("Location: admin_panel.php");
             } else {
+                error_log("Redirecting to index");
                 header("Location: ../index.php");
             }
             exit();
         } else {
             $_SESSION["login_error"] = "Contraseña incorrecta.";
+            error_log("ERROR: Password verification failed");
+            
+            // DEBUG ADICIONAL: Verificar si es un problema de hash
+            error_log("Testing direct comparison: " . ($contrasena === $stored_password ? "MATCH" : "NO MATCH"));
+            
             header("Location: login.php");
             exit();
         }
     } else {
         $_SESSION["login_error"] = "No se encontró una cuenta con ese correo electrónico.";
+        error_log("ERROR: No user found with email: " . $correo);
         header("Location: login.php");
         exit();
     }
@@ -84,7 +122,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -92,7 +129,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../scripts/alertas.js"></script>
     <title>Sistema de Pañol - Iniciar Sesión</title>
-
 </head>
 
 <body>
@@ -112,6 +148,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </script>
             <?php unset($_SESSION["registro_exitoso"]); ?>
         <?php endif; ?>
+        
         <?php if (isset($_SESSION["login_error"])): ?>
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
@@ -126,6 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </script>
             <?php unset($_SESSION["login_error"]); ?>
         <?php endif; ?>
+        
         <h2 class="form-title">Iniciar Sesión</h2>
         <form action="login.php" method="POST">
             <div class="form-group">
@@ -146,5 +184,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </body>
-
 </html>

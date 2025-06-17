@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once('check_session.php');
 ?>
 
 <?php

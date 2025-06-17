@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once('check_session.php');
 require_once('admin_check.php');
 require_once('tool_management.php');
 
