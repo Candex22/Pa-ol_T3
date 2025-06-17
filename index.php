@@ -139,7 +139,7 @@ $logged_in = true; // Replace with actual authentication check
                         <i class="fas fa-chart-bar menu-icon text-info"></i>
                         <h3>Reportes y Estadísticas</h3>
                         <p>Visualiza informes detallados sobre el uso de herramientas y pedidos.</p>
-                        <a href="components/reportes.php" class="btn btn-info">Acceder</a>
+                        <a href="components/estadisticas.php" class="btn btn-info">Acceder</a>
                     </div>
                 </div>
             </div>
